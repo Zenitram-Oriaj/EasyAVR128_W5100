@@ -22,13 +22,12 @@ void SetupHardware(void)
 	NET_Init();
 }
 
-unsigned char Connect(unsigned char sock, unsigned char ip[4] ,unsigned char eth_protocol, unsigned int tcp_port)
-{
+unsigned char Connect(unsigned char sock, unsigned char ip[4] ,unsigned char eth_protocol, unsigned int tcp_port) {
 	unsigned char			retval;
 	unsigned int			sockaddr;
 	
 	retval = W5100_FAIL;	
-																									// assume this doesn't work
+																																				// assume this doesn't work
 	if (sock >= W5100_NUM_SOCKETS)  {
 		return retval;																											// illegal socket value is bad!
 	}
@@ -40,29 +39,26 @@ unsigned char Connect(unsigned char sock, unsigned char ip[4] ,unsigned char eth
 		Close(sock);
 	}
 
-	// W51_write(sockaddr+W5100_MR_OFFSET ,0b01000000);											// Enable Mac Filtering
-	W51_write(sockaddr+W5100_MR_OFFSET ,eth_protocol);										// set protocol for this socket
+	// W51_write(sockaddr+W5100_MR_OFFSET ,0b01000000);														//  Enable Mac Filtering
+	W51_write(sockaddr+W5100_MR_OFFSET ,eth_protocol);										//  set protocol for this socket
 	
-	W51_write(sockaddr+W5100_DIPR_OFFSET,     ip[0]);												// set ip for server
-	W51_write(sockaddr+W5100_DIPR_OFFSET + 1, ip[1]);		// set ip for server
-	W51_write(sockaddr+W5100_DIPR_OFFSET + 2, ip[2]);		// set ip for server
-	W51_write(sockaddr+W5100_DIPR_OFFSET + 3, ip[3]);		// set ip for server
+	W51_write(sockaddr+W5100_DIPR_OFFSET,     ip[0]);											//  set ip for server
+	W51_write(sockaddr+W5100_DIPR_OFFSET + 1, ip[1]);											//  set ip for server
+	W51_write(sockaddr+W5100_DIPR_OFFSET + 2, ip[2]);											//  set ip for server
+	W51_write(sockaddr+W5100_DIPR_OFFSET + 3, ip[3]);											//  set ip for server
 	
-	W51_write(sockaddr+W5100_DPORT_OFFSET, ((tcp_port & 0xFF00) >> 8 ));		// set port for server (MSB)
-	W51_write(sockaddr+W5100_DPORT_OFFSET + 1, (tcp_port & 0x00FF));				// set port for server (LSB)
+	W51_write(sockaddr+W5100_DPORT_OFFSET, ((tcp_port & 0xFF00) >> 8 ));	// set port for server (MSB)
+	W51_write(sockaddr+W5100_DPORT_OFFSET + 1, (tcp_port & 0x00FF));			// set port for server (LSB)
 	
 	W51_write(sockaddr+W5100_CR_OFFSET, W5100_SKT_CR_OPEN);	              // open the socket
 	
 	while (W51_read(sockaddr+W5100_CR_OFFSET))  ;													// loop until device reports socket is open (blocks!!)
 
 	if (W51_read(sockaddr+W5100_SR_OFFSET) == W5100_SKT_SR_INIT){
-		
-		W51_write(sockaddr+W5100_CR_OFFSET, W5100_SKT_CR_CONNECT);	       // connect to server
-		while (W51_read(sockaddr+W5100_CR_OFFSET))  ;											// loop until device reports socket is open (blocks!!)
-		
-		retval = sock;																										// if success, return socket number
-	}
-	else  Close(sock);																							// if failed, close socket immediately
+		W51_write(sockaddr+W5100_CR_OFFSET, W5100_SKT_CR_CONNECT);					// connect to server
+		while (W51_read(sockaddr+W5100_CR_OFFSET))  ;												// loop until device reports socket is open (blocks!!)
+		retval = sock;																											// if success, return socket number
+	} else  Close(sock);																									// if failed, close socket immediately
 
 	return  retval;
 }
@@ -85,7 +81,7 @@ void  Disconnect(unsigned char  sock)
 	unsigned int			sockaddr;
 	
 	if (sock > W5100_NUM_SOCKETS)  {
-		return;																// if illegal socket number, ignore request
+		return;																															// if illegal socket number, ignore request
 	}
 	sockaddr = W5100_SKT_BASE(sock);																			// calc base addr for this socket
 
